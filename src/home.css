@@ -1,0 +1,18 @@
+
+.Home{
+    background-image: linear-gradient(to right, #4fc3f7 , #b3e5fc);
+    height: 3.5rem;
+}
+
+.table{    
+    margin-left: 2rem;
+    width: 95%;
+}
+.heading{
+    text-align: center;
+}
+
+.inputStyle{
+    width: 70%;
+    margin-left: 1rem;
+}
