@@ -1,6 +1,6 @@
 
 .Home{
-    background-image: linear-gradient(to right, #4fc3f7 , #b3e5fc);
+    background-image: linear-gradient(to right, #92d9fa , #cdecfa);
     height: 3.5rem;
 }
 
@@ -14,5 +14,5 @@
 
 .inputStyle{
     width: 70%;
-    margin-left: 1rem;
+    margin-left: 1.2rem;
 }
