@@ -9,10 +9,12 @@ import axios from "axios"
 
 function Home() {
   const [query,setQuery] = useState()
-  const [columnName,setColumnName] = useState([])
-  const [listData,setListData] = useState([])
+  const [allColumnName,setAllColumnName] = useState([])
+  const [queryColumnName,setQueryColumnName] = useState([])
+  const [allListData,setAllListData] = useState([])
   const [queryData,setQueryData] = useState()
   const [flag,setFlag] =useState(0)
+  var firstObjectKeys=[]
 
 
   useEffect(()=>{
@@ -22,9 +24,9 @@ function Home() {
   function getTable(){
     axios.get('http://localhost:8080/all')
       .then(function (response) {
-        setColumnName(response.data.column); 
+        setAllColumnName(response.data.column); 
        const filteredData =  response.data.data.filter((item)=>{return item.id<12});
-       setListData(filteredData)  
+       setAllListData(filteredData)  
 
     })
       .catch(function (error) {
@@ -38,10 +40,9 @@ function Home() {
           query: query
         }
       })
-        .then(function (response) {            
-            const filteredData = response.data.data.map(item=>{return item.data.split(',')});                     
-            setQueryData(filteredData.filter((item)=> {return item[0] <20}))
-            
+        .then(function (response) {
+          setQueryColumnName(response.data.columns);           
+          setQueryData(response.data.data)                          
           }               
         )
         .catch(function (error) {
@@ -49,7 +50,13 @@ function Home() {
         });
     }
     
-    console.log("query",queryData)
+    console.log("query",firstObjectKeys)
+    console.log("sewy",allColumnName)
+    
+             
+  if (queryData !== undefined) 
+  firstObjectKeys.push(Object.keys(queryData[0]))
+  
   return ( 
     <div className='Home'>
         <div className='heading'><h1>Table Data</h1></div>
@@ -61,11 +68,11 @@ function Home() {
         <Table className='table' striped bordered hover style={{width:"95%"}}>
       <thead style={{textAlign:"center",padding:"5px"}}>
         <tr>
-          {columnName.map((res)=>{return <th style={{padding:"8px"}}>{res}</th>})}                 
+          {allColumnName.map((res)=>{return <th style={{padding:"8px"}}>{res}</th>})}                 
         </tr>
       </thead>
       <tbody>
-        {listData.map((item) => (          
+        {allListData.map((item) => (          
           <tr key={item.id}>
             <td>{item.medianHouseValue}</td>
             <td>{item.medianIncome}</td>
@@ -76,7 +83,7 @@ function Home() {
             <td>{item.households}</td>
             <td>{item.latitude}</td>
             <td>{item.longitude}</td>
-            <td>{Math.trunc(item.distanceToCoast)}</td>
+            <td>{Math.trunc(item.distance_to_coast)}</td>
             <td>{Math.trunc(item.distanceToLA)}</td>
             
           </tr>
@@ -99,33 +106,24 @@ function Home() {
 
       {queryData === undefined  ? '' :  <Row style={{marginTop:"1rem"}}>
           <Form.Label  style={{fontSize:"1.5rem" ,fontWeight:"500",marginLeft:"1.5rem"}}>Results</Form.Label>
-        <Table className='table' striped bordered hover style={{width:"95%"}}>
+        <Table className='table' striped bordered hover style={{width:"auto"}}>        
       <thead style={{textAlign:"center",padding:"5px"}}>
-        <tr>
-          {columnName.map((res)=>{return <th style={{padding:"8px"}}>{res}</th>})}                 
-        </tr>
-      </thead>
-      <tbody>
-        {queryData.map((item) => (                  
-                 
-            <tr>
-               {console.log("inner",item)}
-             <td>{item[1]}</td>
-             <td>{item[2]}</td>
-             <td>{item[2]}</td>
-             <td>{item[3]}</td>
-             <td>{item[4]}</td>
-             <td>{item[5]}</td>
-             <td>{item[6]}</td>
-             <td>{item[7]}</td>
-             <td>{item[8]}</td>
-             <td>{Math.trunc(item[9])}</td>
-             <td>{Math.trunc(item[10])}</td> 
-             
-           </tr>
-           ))
+        <tr>{firstObjectKeys[0].map((res)=>{return <th style={{padding:"8px"}}>{res}</th>})}</tr>
+
+
            
-        }
+
+      </thead>
+      <tbody> 
+      {
+        queryData.map((item) => (
+          <tr key={item.id}>
+            {Object.values(item).map((value) => (
+              <td key={value}>{value}</td>
+            ))}
+          </tr>
+        ))
+      }
       </tbody>
     </Table>
         </Row>}  
