@@ -10,10 +10,10 @@ import axios from "axios"
 function Home() {
   const [query,setQuery] = useState()
   const [allColumnName,setAllColumnName] = useState([])
-  const [queryColumnName,setQueryColumnName] = useState([])
   const [allListData,setAllListData] = useState([])
   const [queryData,setQueryData] = useState()
   const [flag,setFlag] =useState(0)
+  const [errorMessage,setErrorMessage] =useState(0)
   var firstObjectKeys=[]
 
 
@@ -33,7 +33,6 @@ function Home() {
        console.log(error);
     })
     }
-   
     function handleClick() {
       axios.get('http://localhost:8080/query', {
         params: {
@@ -41,17 +40,19 @@ function Home() {
         }
       })
         .then(function (response) {
-          setQueryColumnName(response.data.columns);           
-          setQueryData(response.data.data)                          
+          if(response.status === 200)
+          {      
+            setFlag(0)      
+            setQueryData(response.data.data) 
+          }                   
           }               
         )
         .catch(function (error) {
-             console.log(error);          
+          setErrorMessage(error.response.data.erroMessage)
+          setFlag(1)
+             
         });
     }
-    
-    console.log("query",firstObjectKeys)
-    console.log("sewy",allColumnName)
     
              
   if (queryData !== undefined) 
@@ -91,20 +92,19 @@ function Home() {
       </tbody>
     </Table>
         </Row>
-
         <Row style={{marginTop:"1rem"}}>
             <Form>
                  <Form.Group className="mb-3 inputStyle" controlId="exampleForm.ControlInput1">
                      <Form.Label style={{fontSize:"1.5rem" ,fontWeight:"500"}}>Query</Form.Label>
                      <Form.Control type="text"  onChange={(e)=>{setQuery(e.target.value)}}/>
-                     <span className="text-danger">{flag === 1 ? 'Please enter a valid query' : null}</span><br></br>
+                     <span className="text-danger">{flag === 1? errorMessage : ''}</span><br></br>
                      <Button style={{marginTop:"0.5rem"}} onClick={handleClick}>Run Query</Button>
                  </Form.Group>                 
     </Form>      
         </Row>
 
 
-      {queryData === undefined  ? '' :  <Row style={{marginTop:"1rem"}}>
+      {queryData === undefined && flag === 0 ? '' :  <Row style={{marginTop:"1rem"}}>
           <Form.Label  style={{fontSize:"1.5rem" ,fontWeight:"500",marginLeft:"1.5rem"}}>Results</Form.Label>
         <Table className='table' striped bordered hover style={{width:"auto"}}>        
       <thead style={{textAlign:"center",padding:"5px"}}>
